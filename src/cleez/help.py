@@ -36,17 +36,24 @@ class HelpMaker:
         print(bold("Available commands:"))
 
         commands = self.get_commands(commands)
-
         simple_commands = [command for command in commands if " " not in command.name]
         complex_commands = [command for command in commands if " " in command.name]
+
+        self.print_simple_commands_help(simple_commands)
+        self.print_complex_commands_help(complex_commands)
+
+    def print_simple_commands_help(self, commands: list[Command]):
         max_command_length = max(len(command.name) for command in commands)
         w = max_command_length
-
-        for command in simple_commands:
+        for command in commands:
             cmd_name = f"{command.name:<{w}}"
-            print(f"  {blue(cmd_name)}  {command.__doc__}")
+            help = (command.__doc__ or "").split("\n")[0].strip()
+            print(f"  {blue(cmd_name)}  {help}")
 
-        groups = groupby(complex_commands, lambda command: command.name.split(" ")[0])
+    def print_complex_commands_help(self, commands: list[Command]):
+        max_command_length = max(len(command.name) for command in commands)
+        w = max_command_length
+        groups = groupby(commands, lambda command: command.name.split(" ")[0])
         for group_name, group in groups:
             print()
             print(f" {green(group_name)}")
@@ -55,7 +62,8 @@ class HelpMaker:
                 if not command.name:
                     continue
                 cmd_name = f"{command.name:<{w}}"
-                print(f"  {blue(cmd_name)}  {command.__doc__}")
+                help = (command.__doc__ or "").split("\n")[0].strip()
+                print(f"  {blue(cmd_name)}  {help}")
 
     def get_commands(self, commands: list[Command]):
         def sorter(command):

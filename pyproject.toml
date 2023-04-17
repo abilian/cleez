@@ -90,6 +90,7 @@ select = [
 ignore = [
     "S101",  # Use of `assert` detected
     "SIM108", # Use ternary operator
+    "A001",  # Shadowing of built-in
 ]
 
 # ---
