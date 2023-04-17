@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from itertools import groupby
 
-from .cleez import Command, Option
 from .colors import blue, bold, green
+from .command import Command, Option
+
+__all__ = ["HelpMaker"]
 
 
 class HelpMaker:

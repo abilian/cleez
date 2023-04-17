@@ -6,5 +6,5 @@ class CommandWithNoArgs(Command):
 
     name = "subcommand-with-no-args"
 
-    def run(self, service: str):
+    def run(self):
         pass

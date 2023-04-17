@@ -9,15 +9,17 @@ import argparse
 import importlib
 import inspect
 import sys
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from inspect import isabstract, isclass
 from pathlib import Path
 from pkgutil import iter_modules
 
 from .colors import red
 from .command import Command, Option
-from .exceptions import BadArgument, CommandError
+from .exceptions import BadArgumentError, CommandError
 from .help import HelpMaker
+
+__all__ = ["CLI"]
 
 
 @dataclass(frozen=True)
@@ -86,13 +88,12 @@ class CLI:
         for option in self.options:
             parser.add_argument(*option.args, **option.kwargs)
         argv = argv[len(command.name.split()) + 1 :]
-        args = parser.parse_args(argv)
-        return args
+        return parser.parse_args(argv)
 
     def run_command(self, command: Command, args: argparse.Namespace):
         try:
             self.call_command(command, args)
-        except (BadArgument, CommandError) as e:
+        except (BadArgumentError, CommandError) as e:
             print(red(e))
             sys.exit(1)
 

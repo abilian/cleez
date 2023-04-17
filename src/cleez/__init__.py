@@ -4,6 +4,8 @@ __author__ = """Abilian SAS"""
 __email__ = """sf@abilian.com"""
 __version__ = """0.1.0"""
 
-from .cleez import CLI, BadArgument, Command, CommandError
+from .cleez import CLI
+from .command import Command
+from .exceptions import BadArgumentError, CommandError
 
-__all__ = ["CLI", "Command", "CommandError", "BadArgument"]
+__all__ = ["CLI", "Command", "CommandError", "BadArgumentError"]

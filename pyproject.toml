@@ -25,6 +25,8 @@ packages = [
 python = ">=3.9,<4"
 termcolor = "^2.2.0"
 
+# Temp (for debugging)
+snoop = "^0.4.3"
 
 [tool.poetry.group.dev.dependencies]
 ## Standard cruft
@@ -35,7 +37,6 @@ cruft = "*"
 toml = "*"
 
 ## /standard cruft
-snoop = "^0.4.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -88,7 +89,7 @@ select = [
 
 ignore = [
     "S101",  # Use of `assert` detected
-    "I001",  # Import block is un-sorted or un-formatted (WHY!?)
+    "SIM108", # Use ternary operator
 ]
 
 # ---

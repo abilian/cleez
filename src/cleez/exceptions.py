@@ -1,4 +1,4 @@
-class BadArgument(Exception):
+class BadArgumentError(Exception):
     """Exception raised when an argument is invalid."""
 
 

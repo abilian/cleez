@@ -17,7 +17,11 @@ def test_command_with_no_argument():
         "-h", "--help", default=False, action="store_true", help="Show help and exit"
     )
     cli.add_option(
-        "-V", "--version", default=False, action="store_true", help="Show version and exit"
+        "-V",
+        "--version",
+        default=False,
+        action="store_true",
+        help="Show version and exit",
     )
     cli.run(["test", "subcommand-with-no-args"])
 
@@ -30,6 +34,10 @@ def test_scan():
         "-h", "--help", default=False, action="store_true", help="Show help and exit"
     )
     cli.add_option(
-        "-V", "--version", default=False, action="store_true", help="Show version and exit"
+        "-V",
+        "--version",
+        default=False,
+        action="store_true",
+        help="Show version and exit",
     )
     cli.run(["test", "subcommand-with-no-args"])

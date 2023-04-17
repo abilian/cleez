@@ -7,6 +7,9 @@ if typing.TYPE_CHECKING:
     from cleez import CLI
 
 
+__all__ = ["Command", "Argument", "Option"]
+
+
 class Command(ABC):
     name: str
     cli: CLI
@@ -29,6 +32,6 @@ class Argument:
 
 
 class Option:
-    def __init__(self, *args: list[str], **kwargs):
+    def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
