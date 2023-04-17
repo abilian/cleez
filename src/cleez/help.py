@@ -11,7 +11,7 @@ __all__ = ["HelpMaker"]
 class HelpMaker:
     def print_help(self, cli):
         self.print_version(cli)
-        self.print_usage()
+        self.print_usage(cli)
         self.print_options(cli.options)
         self.print_commands(cli.commands)
 
@@ -21,9 +21,9 @@ class HelpMaker:
         print(f"{bold(command_name)} ({version})")
         print()
 
-    def print_usage(self):
+    def print_usage(self, cli):
         print(bold("Usage:"))
-        print("  <command-name> <command> [options] [arguments]")
+        print(f"  {cli.name} <command> [options] [arguments]")
         print()
 
     def print_options(self, options: list[Option]):
@@ -35,11 +35,8 @@ class HelpMaker:
     def print_commands(self, commands: list[Command]):
         print(bold("Available commands:"))
 
-        def sorter(command):
-            return len(command.name.split(" ")), command.name
+        commands = self.get_commands(commands)
 
-        commands = [command for command in commands if command.name]
-        commands = sorted(commands, key=sorter)
         simple_commands = [command for command in commands if " " not in command.name]
         complex_commands = [command for command in commands if " " in command.name]
         max_command_length = max(len(command.name) for command in commands)
@@ -59,3 +56,11 @@ class HelpMaker:
                     continue
                 cmd_name = f"{command.name:<{w}}"
                 print(f"  {blue(cmd_name)}  {command.__doc__}")
+
+    def get_commands(self, commands: list[Command]):
+        def sorter(command):
+            return len(command.name.split(" ")), command.name
+
+        commands = [command for command in commands if command.name]
+        commands = [command for command in commands if not command.hide_from_help]
+        return sorted(commands, key=sorter)

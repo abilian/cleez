@@ -16,7 +16,6 @@ from pkgutil import iter_modules
 
 from .colors import red
 from .command import Command, Option
-from .exceptions import BadArgumentError, CommandError
 from .help import HelpMaker
 
 __all__ = ["CLI"]
@@ -24,30 +23,35 @@ __all__ = ["CLI"]
 
 @dataclass(frozen=True)
 class CLI:
-    commands: list[type[Command]] = field(default_factory=list)
+    name: str = "cleez"
+
+    commands: list[Command] = field(default_factory=list)
     options: list[Option] = field(default_factory=list)
     help_maker: HelpMaker = field(default_factory=HelpMaker)
 
     #
     # Public API
     #
-    def __call__(self):
-        # Convenience. Needed?
-        return self.run()
-
     def run(self, argv=None):
         if not argv:
             argv = sys.argv
-        command = self.find_command(argv)
+
+        parser = self.make_parser()
+
         try:
-            args = self.parse_args(command, argv)
+            args = parser.parse_args(argv[1:])
         except argparse.ArgumentError as e:
             print(red(f"Argument parsing error: {e}\n"))
             print("Usage:\n")
             self.help_maker.print_help(self)
             sys.exit(1)
-        self.common_options(args)
-        self.run_command(command, args)
+
+        # self.common_options(args)
+        if "_command" not in args:
+            self.help_maker.print_help(self)
+            sys.exit()  # exit 0 or exit 1 ?
+
+        self.call_command(args._command, args)
 
     def scan(self, module_name: str):
         root_module = importlib.import_module(module_name)
@@ -61,6 +65,12 @@ class CLI:
                 if isclass(attribute) and issubclass(attribute, Command):
                     self.add_command(attribute)
 
+    def add_command(self, command_class: type[Command]):
+        if isabstract(command_class):
+            return
+
+        self.commands.append(command_class(self))
+
     def add_option(self, *args, **kwargs):
         if args and isinstance(args[0], Option):
             option = args[0]
@@ -71,31 +81,25 @@ class CLI:
     #
     # Internal API
     #
-    def find_command(self, argv: list[str]) -> Command:
-        args = argv[1:]
-        args = [arg for arg in args if not arg.startswith("-")]
-        args_str = " ".join(args)
-        commands = sorted(self.commands, key=lambda command: -len(command.name))
-        for command in commands:
-            if args_str.startswith(command.name):
-                return command(self)
-        raise CommandError("No command found")
+    def get_command(self, name: str) -> Command:
+        for command in self.commands:
+            if command.name == name:
+                return command
+        raise KeyError(f"Command {name} not found")
 
-    def parse_args(self, command: Command, argv: list[str]) -> argparse.Namespace:
-        parser = MyArgParser(add_help=False, exit_on_error=False)
-        for argument in command.arguments:
-            parser.add_argument(*argument.args, **argument.kwargs)
-        for option in self.options:
-            parser.add_argument(*option.args, **option.kwargs)
-        argv = argv[len(command.name.split()) + 1 :]
-        return parser.parse_args(argv)
+    def make_parser(self):
+        parser = MyArgParser()
+        subparsers = parser.add_subparsers(parser_class=MyArgParser)
 
-    def run_command(self, command: Command, args: argparse.Namespace):
-        try:
-            self.call_command(command, args)
-        except (BadArgumentError, CommandError) as e:
-            print(red(e))
-            sys.exit(1)
+        for command in self.commands:
+            if " " in command.name:
+                cmd1, cmd2 = command.name.split(" ")
+                parent_command = self.get_command(cmd1)
+                command.add_subparser_to(parent_command.subparsers)
+            else:
+                command.add_subparser_to(subparsers)
+
+        return parser
 
     def call_command(self, command: Command, args: argparse.Namespace):
         # Inject arguments into the command `run` method.
@@ -113,11 +117,6 @@ class CLI:
 
         command.run(**kwargs)
 
-    def add_command(self, command_class: type[Command]):
-        if isabstract(command_class):
-            return
-        self.commands.append(command_class)
-
     def common_options(self, args: argparse.Namespace):
         if args.help:
             self.help_maker.print_help(self)
@@ -133,7 +132,7 @@ class CLI:
         return "TODO"
 
     def get_command_name(self):
-        return "<command-name>"
+        return self.name
 
 
 class MyArgParser(argparse.ArgumentParser):

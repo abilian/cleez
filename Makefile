@@ -36,7 +36,7 @@ configure-git:
 ## Run python tests
 test:
 	@echo "--> Running Python tests"
-	pytest --ff -x -p no:randomly
+	pytest -x -p no:randomly
 	@echo ""
 
 test-randomly:

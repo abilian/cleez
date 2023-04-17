@@ -17,7 +17,7 @@ classifiers=[
 ]
 packages = [
     { include = "cleez", from = "src" },
-    { include = "tests", format = "sdist" },
+    #    { include = "tests", format = "sdist" },
 ]
 
 
