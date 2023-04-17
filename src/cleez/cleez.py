@@ -95,11 +95,11 @@ class CLI:
 
         for command in sorted(self.commands, key=lambda c: len(c.name.split(" "))):
             if " " in command.name:
-                cmd1, cmd2 = command.name.split(" ")
-                parent_command = self.get_command(cmd1)
+                main_cmd, sub_cms = command.name.split(" ")
+                parent_command = self.get_command(main_cmd)
                 if not parent_command.subparsers:
                     raise ParserBuildError(
-                        f"Parent command '{cmd1}' has not subparsers"
+                        f"Parent command '{main_cmd}' has not subparsers"
                     )
                 command.add_subparser_to(parent_command.subparsers)
             else:
