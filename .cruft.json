@@ -1,0 +1,21 @@
+{
+  "template": "git@github.com:abilian/cookiecutter-abilian-python.git",
+  "commit": "5146f80aa3b37ef95b0948013045abcc88074a35",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "full_name": "Abilian SAS",
+      "email": "sf@abilian.com",
+      "github_username": "sfermigier",
+      "project_name": "Cleez",
+      "project_slug": "cleez",
+      "project_short_description": "Python Boilerplate contains all the boilerplate you need to create a Python package.",
+      "pypi_username": "sfermigier",
+      "version": "0.1.0",
+      "add_pyup_badge": "n",
+      "open_source_license": "Apache Software License 2.0",
+      "_template": "git@github.com:abilian/cookiecutter-abilian-python.git"
+    }
+  },
+  "directory": null
+}

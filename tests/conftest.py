@@ -1,0 +1,3 @@
+import snoop
+
+snoop.install()
