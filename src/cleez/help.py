@@ -43,6 +43,8 @@ class HelpMaker:
         self.print_complex_commands_help(complex_commands)
 
     def print_simple_commands_help(self, commands: list[Command]):
+        if not commands:
+            return
         max_command_length = max(len(command.name) for command in commands)
         w = max_command_length
         for command in commands:
@@ -51,6 +53,8 @@ class HelpMaker:
             print(f"  {blue(cmd_name)}  {help}")
 
     def print_complex_commands_help(self, commands: list[Command]):
+        if not commands:
+            return
         max_command_length = max(len(command.name) for command in commands)
         w = max_command_length
         groups = groupby(commands, lambda command: command.name.split(" ")[0])
@@ -59,8 +63,6 @@ class HelpMaker:
             print(f" {green(group_name)}")
 
             for command in group:
-                if not command.name:
-                    continue
                 cmd_name = f"{command.name:<{w}}"
                 help = (command.__doc__ or "").split("\n")[0].strip()
                 print(f"  {blue(cmd_name)}  {help}")
