@@ -16,6 +16,7 @@ from pkgutil import iter_modules
 
 from .colors import red
 from .command import Command, Option
+from .exceptions import ParserBuildError
 from .help import HelpMaker
 
 __all__ = ["CLI"]
@@ -63,7 +64,8 @@ class CLI:
                 attribute = getattr(module, attribute_name)
 
                 if isclass(attribute) and issubclass(attribute, Command):
-                    self.add_command(attribute)
+                    command = attribute
+                    self.add_command(command)
 
     def add_command(self, command_class: type[Command]):
         if isabstract(command_class):
@@ -91,13 +93,14 @@ class CLI:
         parser = MyArgParser()
         subparsers = parser.add_subparsers(parser_class=MyArgParser)
 
-        for command in self.commands:
+        for command in sorted(self.commands, key=lambda c: len(c.name.split(" "))):
             if " " in command.name:
                 cmd1, cmd2 = command.name.split(" ")
                 parent_command = self.get_command(cmd1)
                 if not parent_command.subparsers:
-                    print(f"Parent command {cmd1} has not subparsers")
-                    raise ValueError(f"Parent command {cmd1} has not subparsers")
+                    raise ParserBuildError(
+                        f"Parent command '{cmd1}' has not subparsers"
+                    )
                 command.add_subparser_to(parent_command.subparsers)
             else:
                 command.add_subparser_to(subparsers)

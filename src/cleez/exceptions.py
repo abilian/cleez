@@ -4,3 +4,7 @@ class BadArgumentError(Exception):
 
 class CommandError(Exception):
     """Exception raised when a command fails."""
+
+
+class ParserBuildError(Exception):
+    """Exception raised when a parser cannot be built."""
