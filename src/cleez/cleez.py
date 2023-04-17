@@ -95,6 +95,9 @@ class CLI:
             if " " in command.name:
                 cmd1, cmd2 = command.name.split(" ")
                 parent_command = self.get_command(cmd1)
+                if not parent_command.subparsers:
+                    print(f"Parent command {cmd1} has not subparsers")
+                    raise ValueError(f"Parent command {cmd1} has not subparsers")
                 command.add_subparser_to(parent_command.subparsers)
             else:
                 command.add_subparser_to(subparsers)
