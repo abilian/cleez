@@ -40,7 +40,17 @@ def test_scan():
         action="store_true",
         help="Show version and exit",
     )
+
     cli.run(["test", "command-with-no-args"])
+
     cli.run(["test", "command-with-args", "1", "2"])
+
     cli.run(["test", "main"])
+
     cli.run(["test", "main", "sub"])
+
+    cli.run(["test", "main", "sub2", "1"])
+
+    cli.run(["test", "main", "sub3", "1"])
+    cli.run(["test", "main", "sub3", "1", "2"])
+    cli.run(["test", "main", "sub3"])

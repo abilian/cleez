@@ -39,7 +39,8 @@ class Command(ABC):
         for option in self.options:
             subparser.add_argument(*option.args, **option.kwargs)
 
-        self.subparsers = subparser.add_subparsers()
+        if " " not in self.name:
+            self.subparsers = subparser.add_subparsers()
 
 
 class Argument:

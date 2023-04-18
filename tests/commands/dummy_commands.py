@@ -20,8 +20,9 @@ class CommandWithArgs(Command):
         Argument("arg2", type=int),
     ]
 
-    def run(self):
-        pass
+    def run(self, arg1: int, arg2: int):
+        assert isinstance(arg1, int)
+        assert isinstance(arg1, int)
 
 
 class MainCommand(Command):
@@ -40,3 +41,30 @@ class SubCommand(Command):
 
     def run(self):
         pass
+
+
+class SubCommandWithArg(Command):
+    """Sub command."""
+
+    name = "main sub2"
+
+    arguments = [
+        Argument("arg", type=int),
+    ]
+
+    def run(self, arg: int):
+        assert isinstance(arg, int)
+
+
+class SubCommandWithStarArgs(Command):
+    """Sub command."""
+
+    name = "main sub3"
+
+    arguments = [
+        Argument("args", nargs="*", type=int),
+    ]
+
+    def run(self, args: list[int]):
+        for arg in args:
+            assert isinstance(arg, int)
