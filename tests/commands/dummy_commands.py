@@ -22,7 +22,7 @@ class CommandWithArgs(Command):
 
     def run(self, arg1: int, arg2: int):
         assert isinstance(arg1, int)
-        assert isinstance(arg1, int)
+        assert isinstance(arg2, int)
 
 
 class MainCommand(Command):
