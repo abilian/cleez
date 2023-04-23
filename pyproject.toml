@@ -27,6 +27,7 @@ termcolor = "^2.2.0"
 
 # Temp (for debugging)
 snoop = "^0.4.3"
+click = "^8.1.3"
 
 [tool.poetry.group.dev.dependencies]
 ## Standard cruft
@@ -87,10 +88,23 @@ select = [
 ]
 # Add later: "ANN", "ERA"...
 
+exclude = [
+    "src/cleez/testing.py",
+#    ".tox",
+#    ".nox",
+#    "tests",
+#    "sandbox",
+#    "doc",
+#    "scripts",
+#    "tmp",
+]
+
 ignore = [
     "S101",  # Use of `assert` detected
     "SIM108", # Use ternary operator
     "A001",  # Shadowing of built-in
+    "A002",  # Argument `input` is shadowing a python builtin
+    "I001",  # Ruff not agreeing with isort
 ]
 
 # ---

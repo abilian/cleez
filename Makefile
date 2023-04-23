@@ -92,7 +92,7 @@ audit:
 
 ## Format / beautify code
 format:
-	docformatter -i -r src
+	# docformatter -i -r src
 	black src
 	isort src tests
 

@@ -54,6 +54,9 @@ class CLI:
 
         self.call_command(args._command, args)
 
+    def main(self, args, prog_name):
+        return self.run(args)
+
     def scan(self, module_name: str):
         root_module = importlib.import_module(module_name)
         root_module_name = root_module.__name__

@@ -1,4 +1,8 @@
+import pytest
+
 from cleez import CLI, Command
+from cleez.actions import STORE_TRUE
+from cleez.testing import CliRunner
 
 
 class CommandWithNoArgument(Command):
@@ -10,20 +14,31 @@ class CommandWithNoArgument(Command):
         pass
 
 
-def test_command_with_no_argument():
+@pytest.fixture()
+def cli():
     cli = CLI()
     cli.add_command(CommandWithNoArgument)
     cli.add_option(
-        "-h", "--help", default=False, action="store_true", help="Show help and exit"
+        "-h", "--help", default=False, action=STORE_TRUE, help="Show help and exit"
     )
     cli.add_option(
         "-V",
         "--version",
         default=False,
-        action="store_true",
+        action=STORE_TRUE,
         help="Show version and exit",
     )
+    return cli
+
+
+def test_command_with_no_argument(cli):
     cli.run(["test", "command-with-no-args"])
+
+
+def test_test_runner(cli):
+    runner = CliRunner()
+    result = runner.invoke(cli, ["test", "command-with-no-args"])
+    assert result.exit_code == 0
 
 
 def test_scan():
