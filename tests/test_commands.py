@@ -1,7 +1,6 @@
 from unittest import skip
 
 import pytest
-from devtools import debug
 
 from cleez import CLI, Command
 from cleez.actions import VERSION
@@ -58,7 +57,6 @@ def test_test_runner(cli):
 def test_test_runner_version(cli):
     runner = CliRunner()
     result = runner.invoke(cli, ["test", "command-with-no-args", "-V"])
-    debug(result.stdout)
     assert "version:" in result.stdout
     assert result.exit_code == 0
 

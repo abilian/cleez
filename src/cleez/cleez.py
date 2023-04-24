@@ -25,6 +25,7 @@ __all__ = ["CLI"]
 @dataclass(frozen=True)
 class CLI:
     name: str = "cleez"
+    version: str = "0.1.0"
 
     commands: list[Command] = field(default_factory=list)
     options: list[Option] = field(default_factory=list)
@@ -145,7 +146,7 @@ class CLI:
         self.help_maker.print_help(self)
 
     def get_version(self):
-        return "TODO"
+        return self.version
 
     def get_command_name(self):
         return self.name
