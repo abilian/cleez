@@ -54,7 +54,7 @@ class CLI:
 
         self.call_command(args._command, args)
 
-    def main(self, args, prog_name):
+    def main(self, args, prog_name, **extra):
         return self.run(args)
 
     def scan(self, module_name: str):
@@ -78,6 +78,12 @@ class CLI:
 
     def add_option(self, *args, **kwargs):
         if args and isinstance(args[0], Option):
+            assert (
+                len(args) == 1
+            ), f"Only one option can be added at a time (got {len(args):d})"
+            assert (
+                not kwargs
+            ), "Cannot pass keyword arguments when adding an option object"
             option = args[0]
             self.options.append(option)
         else:
@@ -96,9 +102,10 @@ class CLI:
         parser = MyArgParser()
         subparsers = parser.add_subparsers(parser_class=MyArgParser)
 
-        for command in sorted(self.commands, key=lambda c: len(c.name.split(" "))):
-            if " " in command.name:
-                main_cmd, sub_cms = command.name.split(" ")
+        for command in sorted(self.commands, key=len):
+            if command.is_subcommand():
+                main_cmd = command.main_command_name()
+                # sub_cmd = command.subcommand_name()
                 parent_command = self.get_command(main_cmd)
                 if not parent_command.subparsers:
                     raise ParserBuildError(

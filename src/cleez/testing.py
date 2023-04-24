@@ -1,5 +1,18 @@
 """
-Copy / pasted from click.testing
+Copy / pasted from click.testing then simplified.
+
+Original copytight notice:
+
+Copyright 2014 Pallets
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """
 
 from __future__ import annotations
@@ -8,14 +21,10 @@ import contextlib
 import io
 import os
 import shlex
-import shutil
 import sys
-import tempfile
 import typing as t
 from collections.abc import Iterator, Mapping, Sequence
 from types import TracebackType
-
-from click import formatting, termui, utils
 
 from .cleez import CLI
 
@@ -28,28 +37,15 @@ class CliRunner:
 
     :param charset: the character set for the input and output data.
     :param env: a dictionary with environment variables for overriding.
-    :param echo_stdin: if this is set to `True`, then reading from stdin writes
-                       to stdout.  This is useful for showing examples in
-                       some circumstances.  Note that regular prompts
-                       will automatically echo the input.
-    :param mix_stderr: if this is set to `False`, then stdout and stderr are
-                       preserved as independent streams.  This is useful for
-                       Unix-philosophy apps that have predictable stdout and
-                       noisy stderr, such that each may be measured
-                       independently
     """
 
     def __init__(
         self,
         charset: str = "utf-8",
         env: Mapping[str, str | None] | None = None,
-        echo_stdin: bool = False,
-        mix_stderr: bool = True,
     ) -> None:
         self.charset = charset
         self.env = env or {}
-        self.echo_stdin = echo_stdin
-        self.mix_stderr = mix_stderr
 
     def invoke(
         self,
@@ -58,7 +54,6 @@ class CliRunner:
         input: str | bytes | t.IO | None = None,
         env: Mapping[str, str | None] | None = None,
         catch_exceptions: bool = True,
-        color: bool = False,
         **extra: t.Any,
     ) -> Result:
         """Invokes a command in an isolated environment.  The arguments are
@@ -78,11 +73,9 @@ class CliRunner:
         :param catch_exceptions: Whether to catch any other exceptions than
                                  ``SystemExit``.
         :param extra: the keyword arguments to pass to :meth:`main`.
-        :param color: whether the output should contain color codes. The
-                      application can still override this explicitly.
         """
         exc_info = None
-        with self.isolation(input=input, env=env, color=color) as outstreams:
+        with self.isolation(input=input, env=env) as outstreams:
             return_value = None
             exception: BaseException | None = None
             exit_code = 0
@@ -123,10 +116,7 @@ class CliRunner:
             finally:
                 sys.stdout.flush()
                 stdout = outstreams[0].getvalue()
-                if self.mix_stderr:
-                    stderr = None
-                else:
-                    stderr = outstreams[1].getvalue()  # type: ignore
+                stderr = outstreams[1].getvalue()  # type: ignore
 
         return Result(
             runner=self,
@@ -139,44 +129,14 @@ class CliRunner:
         )
 
     @contextlib.contextmanager
-    def isolated_filesystem(
-        self, temp_dir: str | os.PathLike | None = None
-    ) -> Iterator[str]:
-        """A context manager that creates a temporary directory and changes the
-        current working directory to it. This isolates tests that affect the
-        contents of the CWD to prevent them from interfering with each other.
-
-        :param temp_dir: Create the temporary directory under this
-            directory. If given, the created directory is not removed
-            when exiting.
-
-        .. versionchanged:: 8.0
-            Added the ``temp_dir`` parameter.
-        """
-        cwd = os.getcwd()
-        dt = tempfile.mkdtemp(dir=temp_dir)
-        os.chdir(dt)
-
-        yield dt
-
-        os.chdir(cwd)
-
-        if temp_dir is None:
-            with contextlib.suppress(OSError):
-                shutil.rmtree(dt)
-
-    @contextlib.contextmanager
     def isolation(
         self,
         input: str | bytes | t.IO | None = None,
         env: Mapping[str, str | None] | None = None,
-        color: bool = False,
     ) -> Iterator[tuple[io.BytesIO, io.BytesIO | None]]:
         """A context manager that sets up the isolation for invoking of a
         command line tool.  This sets up stdin with the given input data and
-        `os.environ` with the overrides from the given dictionary. This also
-        rebinds some internals in Click to be mocked (like the prompt
-        functionality).
+        `os.environ` with the overrides from the given dictionary.
 
         This is automatically done in the :meth:`invoke` method.
 
@@ -185,100 +145,32 @@ class CliRunner:
         :param color: whether the output should contain color codes. The
                       application can still override this explicitly.
 
-        .. versionchanged:: 8.0
-            ``stderr`` is opened with ``errors="backslashreplace"``
-            instead of the default ``"strict"``.
-
-        .. versionchanged:: 4.0
-            Added the ``color`` parameter.
         """
         bytes_input = make_input_stream(input, self.charset)
-        echo_input = None
 
         old_stdin = sys.stdin
         old_stdout = sys.stdout
         old_stderr = sys.stderr
-        old_forced_width = formatting.FORCED_WIDTH
-        formatting.FORCED_WIDTH = 80
 
         env = self.make_env(env)
 
         bytes_output = io.BytesIO()
 
-        if self.echo_stdin:
-            bytes_input = echo_input = t.cast(
-                t.BinaryIO, EchoingStdin(bytes_input, bytes_output)
-            )
-
         sys.stdin = text_input = _NamedTextIOWrapper(
             bytes_input, encoding=self.charset, name="<stdin>", mode="r"
         )
-
-        if self.echo_stdin:
-            # Force unbuffered reads, otherwise TextIOWrapper reads a
-            # large chunk which is echoed early.
-            text_input._CHUNK_SIZE = 1  # type: ignore
-
         sys.stdout = _NamedTextIOWrapper(
             bytes_output, encoding=self.charset, name="<stdout>", mode="w"
         )
 
-        bytes_error = None
-        if self.mix_stderr:
-            sys.stderr = sys.stdout
-        else:
-            bytes_error = io.BytesIO()
-            sys.stderr = _NamedTextIOWrapper(
-                bytes_error,
-                encoding=self.charset,
-                name="<stderr>",
-                mode="w",
-                errors="backslashreplace",
-            )
-
-        @_pause_echo(echo_input)  # type: ignore
-        def visible_input(prompt: str | None = None) -> str:
-            sys.stdout.write(prompt or "")
-            val = text_input.readline().rstrip("\r\n")
-            sys.stdout.write(f"{val}\n")
-            sys.stdout.flush()
-            return val
-
-        @_pause_echo(echo_input)  # type: ignore
-        def hidden_input(prompt: str | None = None) -> str:
-            sys.stdout.write(f"{prompt or ''}\n")
-            sys.stdout.flush()
-            return text_input.readline().rstrip("\r\n")
-
-        @_pause_echo(echo_input)  # type: ignore
-        def _getchar(echo: bool) -> str:
-            char = sys.stdin.read(1)
-
-            if echo:
-                sys.stdout.write(char)
-
-            sys.stdout.flush()
-            return char
-
-        default_color = color
-
-        def should_strip_ansi(
-            stream: t.IO | None = None, color: bool | None = None
-        ) -> bool:
-            if color is None:
-                return not default_color
-            return not color
-
-        old_visible_prompt_func = termui.visible_prompt_func
-        old_hidden_prompt_func = termui.hidden_prompt_func
-        old__getchar_func = termui._getchar
-        old_should_strip_ansi = utils.should_strip_ansi
-
-        termui.visible_prompt_func = visible_input
-        termui.hidden_prompt_func = hidden_input
-        termui._getchar = _getchar
-        utils.should_strip_ansi = should_strip_ansi
-
+        bytes_error = io.BytesIO()
+        sys.stderr = _NamedTextIOWrapper(
+            bytes_error,
+            encoding=self.charset,
+            name="<stderr>",
+            mode="w",
+            errors="backslashreplace",
+        )
         old_env = {}
         try:
             for key, value in env.items():
@@ -302,12 +194,6 @@ class CliRunner:
             sys.stderr = old_stderr
             sys.stdin = old_stdin
 
-            termui.visible_prompt_func = old_visible_prompt_func
-            termui.hidden_prompt_func = old_hidden_prompt_func
-            termui._getchar = old__getchar_func
-            utils.should_strip_ansi = old_should_strip_ansi
-            formatting.FORCED_WIDTH = old_forced_width
-
     def make_env(
         self, overrides: Mapping[str, str | None] | None = None
     ) -> Mapping[str, str | None]:
@@ -325,30 +211,6 @@ class CliRunner:
         set.
         """
         return cli.name or "root"
-
-
-# Was:
-# class CliRunner(ClickCliRunner):
-#     def invoke(  # type: ignore
-#             self,
-#             app: Typer,
-#             args: Optional[Union[str, Sequence[str]]] = None,
-#             input: Optional[Union[bytes, str, IO[Any]]] = None,
-#             env: Optional[Mapping[str, str]] = None,
-#             catch_exceptions: bool = True,
-#             color: bool = False,
-#             **extra: Any,
-#     ) -> Result:
-#         use_cli = _get_command(app)
-#         return super().invoke(
-#             use_cli,
-#             args=args,
-#             input=input,
-#             env=env,
-#             catch_exceptions=catch_exceptions,
-#             color=color,
-#             **extra,
-#         )
 
 
 class Result:
@@ -425,48 +287,24 @@ class _NamedTextIOWrapper(io.TextIOWrapper):
         return self._mode
 
 
-class EchoingStdin:
-    def __init__(self, input: t.BinaryIO, output: t.BinaryIO) -> None:
-        self._input = input
-        self._output = output
-        self._paused = False
+def make_input_stream(input: str | bytes | t.IO | None, charset: str) -> t.BinaryIO:
+    # Is already an input stream.
+    if hasattr(input, "read"):
+        rv = _find_binary_reader(t.cast(t.IO, input))
 
-    def __getattr__(self, x: str) -> t.Any:
-        return getattr(self._input, x)
+        if rv is not None:
+            return rv
 
-    def _echo(self, rv: bytes) -> bytes:
-        if not self._paused:
-            self._output.write(rv)
+        raise TypeError("Could not find binary reader for input stream.")
 
-        return rv
-
-    def read(self, n: int = -1) -> bytes:
-        return self._echo(self._input.read(n))
-
-    def read1(self, n: int = -1) -> bytes:
-        return self._echo(self._input.read1(n))  # type: ignore
-
-    def readline(self, n: int = -1) -> bytes:
-        return self._echo(self._input.readline(n))
-
-    def readlines(self) -> list[bytes]:
-        return [self._echo(x) for x in self._input.readlines()]
-
-    def __iter__(self) -> Iterator[bytes]:
-        return iter(self._echo(x) for x in self._input)
-
-    def __repr__(self) -> str:
-        return repr(self._input)
-
-
-@contextlib.contextmanager
-def _pause_echo(stream: EchoingStdin | None) -> Iterator[None]:
-    if stream is None:
-        yield
+    if input is None:
+        input_b = b""
+    elif isinstance(input, str):
+        input_b = input.encode(charset)
     else:
-        stream._paused = True
-        yield
-        stream._paused = False
+        input_b = input
+
+    return io.BytesIO(input_b)
 
 
 def _is_binary_reader(stream: t.IO, default: bool = False) -> bool:
@@ -494,23 +332,3 @@ def _find_binary_reader(stream: t.IO) -> t.BinaryIO | None:
         return t.cast(t.BinaryIO, buf)
 
     return None
-
-
-def make_input_stream(input: str | bytes | t.IO | None, charset: str) -> t.BinaryIO:
-    # Is already an input stream.
-    if hasattr(input, "read"):
-        rv = _find_binary_reader(t.cast(t.IO, input))
-
-        if rv is not None:
-            return rv
-
-        raise TypeError("Could not find binary reader for input stream.")
-
-    if input is None:
-        input_b = b""
-    elif isinstance(input, str):
-        input_b = input.encode(charset)
-    else:
-        input_b = input
-
-    return io.BytesIO(input_b)

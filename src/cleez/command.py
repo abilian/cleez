@@ -28,7 +28,7 @@ class Command(ABC):
         raise NotImplementedError
 
     def add_subparser_to(self, subparsers):
-        name = self.name.split(" ")[-1]
+        name = self.split()[-1]
 
         subparser = subparsers.add_parser(name, help=self.__doc__)
         subparser.set_defaults(_command=self)
@@ -39,8 +39,31 @@ class Command(ABC):
         for option in self.options:
             subparser.add_argument(*option.args, **option.kwargs)
 
-        if " " not in self.name:
+        if not self.is_subcommand():
             self.subparsers = subparser.add_subparsers()
+
+    def is_subcommand(self):
+        return " " in self.name
+
+    def main_command_name(self):
+        return self.split()[0]
+
+    def subcommand_name(self):
+        return self.split()[1]
+
+    def __len__(self):
+        return len(self.split())
+
+    def split(self):
+        args = self.name.split(" ")
+        assert len(args) in {
+            1,
+            2,
+        }, (
+            "Command name must be composed of one or "
+            "two words (i.e. '<command> <subcommand>')"
+        )
+        return args
 
 
 class Argument:

@@ -36,8 +36,10 @@ class HelpMaker:
         print(bold("Available commands:"))
 
         commands = self.get_commands(commands)
-        simple_commands = [command for command in commands if " " not in command.name]
-        complex_commands = [command for command in commands if " " in command.name]
+        simple_commands = [
+            command for command in commands if not command.is_subcommand()
+        ]
+        complex_commands = [command for command in commands if command.is_subcommand()]
 
         self.print_simple_commands_help(simple_commands)
         self.print_complex_commands_help(complex_commands)
@@ -57,7 +59,7 @@ class HelpMaker:
             return
         max_command_length = max(len(command.name) for command in commands)
         w = max_command_length
-        groups = groupby(commands, lambda command: command.name.split(" ")[0])
+        groups = groupby(commands, lambda command: command.main_command_name())
         for group_name, group in groups:
             print()
             print(f" {green(group_name)}")
@@ -69,7 +71,7 @@ class HelpMaker:
 
     def get_commands(self, commands: list[Command]):
         def sorter(command):
-            return len(command.name.split(" ")), command.name
+            return len(command), command.name
 
         commands = [command for command in commands if command.name]
         commands = [command for command in commands if not command.hide_from_help]

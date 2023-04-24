@@ -59,14 +59,14 @@ vulture = "*"
 
 [[package]]
 name = "argcomplete"
-version = "3.0.6"
+version = "3.0.8"
 description = "Bash tab completion for argparse"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "argcomplete-3.0.6-py3-none-any.whl", hash = "sha256:798f28e11dc141f415879497599316a8a9126672a883064b851597a0d94be8a9"},
-    {file = "argcomplete-3.0.6.tar.gz", hash = "sha256:9fe49c66ba963b81b64025f74bfbd0275619a6bde1c7370654dc365d4ecc9a0b"},
+    {file = "argcomplete-3.0.8-py3-none-any.whl", hash = "sha256:e36fd646839933cbec7941c662ecb65338248667358dd3d968405a4506a60d9b"},
+    {file = "argcomplete-3.0.8.tar.gz", hash = "sha256:b9ca96448e14fa459d7450a4ab5a22bbf9cee4ba7adddf03e65c398b5daeea28"},
 ]
 
 [package.extras]
@@ -367,7 +367,7 @@ tests = ["Django", "Django (<2)", "Django (<3)", "chainmap", "numpy (>=1.16.3)",
 name = "click"
 version = "8.1.3"
 description = "Composable command line interface toolkit"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -396,7 +396,7 @@ setuptools = "*"
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 files = [
@@ -568,6 +568,25 @@ pathspec = ">=0.9.0"
 tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
+name = "devtools"
+version = "0.11.0"
+description = "Python's missing debug print command, and more."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "devtools-0.11.0-py3-none-any.whl", hash = "sha256:22a3b65b58713ccd7e8586feffdefaad57bbdbc6ff76bd68ecf3150a00cf41e3"},
+    {file = "devtools-0.11.0.tar.gz", hash = "sha256:4a6d987dfab0c7513a514e7faf0a71296d220423470204e76e0752d146dfad62"},
+]
+
+[package.dependencies]
+asttokens = ">=2.0.0,<3.0.0"
+executing = ">=1.1.1"
+
+[package.extras]
+pygments = ["pygments (>=2.2.0)"]
+
+[[package]]
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
@@ -581,14 +600,14 @@ files = [
 
 [[package]]
 name = "docformatter"
-version = "1.6.2"
+version = "1.6.3"
 description = "Formats docstrings to follow PEP 257"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "docformatter-1.6.2-py3-none-any.whl", hash = "sha256:abe971c977595818f5ef981377384a1811ef9c259c65c38ef860a3fc2ec02c03"},
-    {file = "docformatter-1.6.2.tar.gz", hash = "sha256:49598da0f9e538802895142f08d15349d501800cf508af0e33fb23020dc840ec"},
+    {file = "docformatter-1.6.3-py3-none-any.whl", hash = "sha256:7d971222d86678e3d699a3e9fdf5dd5b04a027b55642f4628c50180577c63a23"},
+    {file = "docformatter-1.6.3.tar.gz", hash = "sha256:c1377c5a3d01b3f3c325158c6de904d3d6167eb3a0eeeff8d9e66a678177d337"},
 ]
 
 [package.dependencies]
@@ -2219,14 +2238,14 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "termcolor"
-version = "2.2.0"
+version = "2.3.0"
 description = "ANSI color formatting for output in terminal"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "termcolor-2.2.0-py3-none-any.whl", hash = "sha256:91ddd848e7251200eac969846cbae2dacd7d71c2871e92733289e7e3666f48e7"},
-    {file = "termcolor-2.2.0.tar.gz", hash = "sha256:dfc8ac3f350788f23b2947b3e6cfa5a53b630b612e6cd8965a015a776020b99a"},
+    {file = "termcolor-2.3.0-py3-none-any.whl", hash = "sha256:3afb05607b89aed0ffe25202399ee0867ad4d3cb4180d98aaf8eefa6a5f7d475"},
+    {file = "termcolor-2.3.0.tar.gz", hash = "sha256:b5b08f68937f138fe92f6c089b99f1e2da0ae56c52b78bf7075fd95420fd9a5a"},
 ]
 
 [package.extras]
@@ -2392,4 +2411,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "ef2edd3afc6a5c8c1bd789ba4cbc97ba0ee6593ac4358e056027f54a956d7605"
+content-hash = "13c3f31f1ad0b6e3937ec6f6b1393861010641e26ca8821dbe671592606711eb"
