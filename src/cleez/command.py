@@ -28,6 +28,9 @@ class Command(ABC):
         self.subparsers = None
         self._subcommands = []
 
+    def __repr__(self):
+        return f"<Command '{self.name}'>"
+
     @abstractmethod
     def run(self, *args, **kwargs):
         raise NotImplementedError

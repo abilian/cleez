@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import inspect
+import os
 import sys
 from dataclasses import dataclass, field
 from inspect import isabstract, isclass
@@ -21,6 +22,8 @@ from .exceptions import ParserBuildError
 from .help import HelpMaker
 
 __all__ = ["CLI"]
+
+DEBUG = os.environ.get("DEBUG_CLEEZ", False)
 
 
 @dataclass(frozen=True)
@@ -107,11 +110,17 @@ class CLI:
         for option in self.options:
             option.add_to_parser(parser)
 
-        commands = sorted(self.commands, key=len)
+        def sorter(cmd):
+            return cmd.main_command_name(), len(cmd)
+
+        commands = sorted(self.commands, key=sorter)
 
         assert all(len(c) in [1, 2] for c in commands)
 
-        for _k, g in groupby(commands, lambda x: x.main_command_name()):
+        def grouper(cmd):
+            return cmd.main_command_name()
+
+        for _k, g in groupby(commands, grouper):
             group = list(g)
             if len(group) > 1:
                 main = group[0]
@@ -122,7 +131,6 @@ class CLI:
         for command in commands:
             if command.is_subcommand():
                 main_cmd = command.main_command_name()
-                # sub_cmd = command.subcommand_name()
                 parent_command = self.get_command(main_cmd)
                 if not parent_command.subparsers:
                     raise ParserBuildError(
