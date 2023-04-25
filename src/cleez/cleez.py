@@ -23,6 +23,8 @@ from .help import HelpMaker
 
 __all__ = ["CLI"]
 
+from .parser import PatchedArgumentParser
+
 DEBUG = os.environ.get("DEBUG_CLEEZ", False)
 
 
@@ -42,7 +44,7 @@ class CLI:
         if not argv:
             argv = sys.argv
 
-        parser = self.make_parser()
+        parser = self.make_parser
 
         try:
             args = parser.parse_args(argv[1:])
@@ -106,9 +108,10 @@ class CLI:
                 return command
         raise KeyError(f"Command {name} not found")
 
+    @property
     def make_parser(self):
-        parser = MyArgParser()
-        subparsers = parser.add_subparsers(parser_class=MyArgParser)
+        parser = PatchedArgumentParser()
+        subparsers = parser.add_subparsers(parser_class=PatchedArgumentParser)
 
         for option in self.options:
             option.add_to_parser(parser)
@@ -177,13 +180,3 @@ class CLI:
 
     def get_command_name(self):
         return self.name
-
-
-class MyArgParser(argparse.ArgumentParser):
-    """Subclass of argparse.ArgumentParser that doesn't exit on error.
-
-    See: https://github.com/python/cpython/issues/103498
-    """
-
-    def error(self, message):
-        raise argparse.ArgumentError(None, message)

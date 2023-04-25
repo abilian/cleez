@@ -4,6 +4,7 @@ import typing
 from abc import ABC, abstractmethod
 
 from .argument import Argument, Option
+from .parser import PatchedArgumentParser
 
 if typing.TYPE_CHECKING:
     from cleez import CLI
@@ -48,7 +49,9 @@ class Command(ABC):
             option.add_to_parser(subparser)
 
         if self.has_subcommands():
-            self.subparsers = subparser.add_subparsers()
+            self.subparsers = subparser.add_subparsers(
+                parser_class=PatchedArgumentParser
+            )
 
     def add_subcommand(self, command: Command):
         self._subcommands.append(command)
