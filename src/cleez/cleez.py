@@ -78,6 +78,9 @@ class CLI:
     def add_command(self, command_class: type[Command]):
         if isabstract(command_class):
             return
+        for command in self.commands:
+            if command.name == command_class.name:
+                return
 
         self.commands.append(command_class(self))
 
