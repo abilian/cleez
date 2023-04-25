@@ -1,4 +1,5 @@
 from cleez import CLI, Command, Argument
+from cleez.actions import VERSION
 from cleez.colors import blue, green
 
 
@@ -52,17 +53,11 @@ def main():
     cli.add_command(ServerRestartCommand)
 
     cli.add_option(
-        "-h",
-        "--help",
-        default=False,
-        action="store_true",
-        help="Show help and exit",
-    )
-    cli.add_option(
         "-V",
         "--version",
         default=False,
-        action="store_true",
+        action=VERSION,
+        version=f"cleez version: {cli.version}",
         help="Show version and exit",
     )
     cli.run()

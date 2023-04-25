@@ -11,6 +11,7 @@ import inspect
 import sys
 from dataclasses import dataclass, field
 from inspect import isabstract, isclass
+from itertools import groupby
 from pathlib import Path
 from pkgutil import iter_modules
 
@@ -103,18 +104,33 @@ class CLI:
         parser = MyArgParser()
         subparsers = parser.add_subparsers(parser_class=MyArgParser)
 
-        for command in sorted(self.commands, key=len):
+        for option in self.options:
+            option.add_to_parser(parser)
+
+        commands = sorted(self.commands, key=len)
+
+        assert all(len(c) in [1, 2] for c in commands)
+
+        for _k, g in groupby(commands, lambda x: x.main_command_name()):
+            group = list(g)
+            if len(group) > 1:
+                main = group[0]
+                for sub in group[1:]:
+                    assert main.main_command_name() == sub.main_command_name()
+                    main.add_subcommand(sub)
+
+        for command in commands:
             if command.is_subcommand():
                 main_cmd = command.main_command_name()
                 # sub_cmd = command.subcommand_name()
                 parent_command = self.get_command(main_cmd)
                 if not parent_command.subparsers:
                     raise ParserBuildError(
-                        f"Parent command '{main_cmd}' has not subparsers"
+                        f"Parent command '{main_cmd}' has no subparsers"
                     )
-                command.add_subparser_to(parent_command.subparsers)
+                command.add_to_subparsers(parent_command.subparsers)
             else:
-                command.add_subparser_to(subparsers)
+                command.add_to_subparsers(subparsers)
 
         return parser
 
@@ -134,13 +150,13 @@ class CLI:
 
         command.run(**kwargs)
 
-    def common_options(self, args: argparse.Namespace):
-        if args.help:
-            self.help_maker.print_help(self)
-            sys.exit(0)
-        if args.version:
-            print(self.get_version())
-            sys.exit(0)
+    # def common_options(self, args: argparse.Namespace):
+    #     if args.help:
+    #         self.help_maker.print_help(self)
+    #         sys.exit(0)
+    #     if args.version:
+    #         print(self.get_version())
+    #         sys.exit(0)
 
     def print_help(self):
         self.help_maker.print_help(self)

@@ -1,5 +1,3 @@
-from unittest import skip
-
 import pytest
 
 from cleez import CLI, Command
@@ -35,14 +33,18 @@ def test_command_with_no_argument(cli):
     cli.run(["test", "command-with-no-args"])
 
 
-@skip("Shouldn't raise SystemExit")
 def test_help(cli):
-    cli.run(["test", "command-with-no-args", "-h"])
+    try:
+        cli.run(["test", "command-with-no-args", "-h"])
+    except SystemExit as e:
+        assert e.code == 0
 
 
-@skip("Can't deal with --version for now")
 def test_version(cli):
-    cli.run(["test", "command-with-no-args", "-V"])
+    try:
+        cli.run(["test", "-V", "command-with-no-args"])
+    except SystemExit as e:
+        assert e.code == 0
 
 
 # With CliRunner
@@ -53,10 +55,9 @@ def test_test_runner(cli):
     assert "Hello!" in result.stdout
 
 
-@skip("Can't deal with --version for now")
 def test_test_runner_version(cli):
     runner = CliRunner()
-    result = runner.invoke(cli, ["test", "command-with-no-args", "-V"])
+    result = runner.invoke(cli, ["test", "-V", "command-with-no-args"])
     assert "version:" in result.stdout
     assert result.exit_code == 0
 

@@ -126,7 +126,7 @@ clean:
 
 ## Cleanup harder
 tidy: clean
-	rm -rf .nox
+	rm -rf .nox .tox
 	rm -rf node_modules
 	rm -rf instance
 

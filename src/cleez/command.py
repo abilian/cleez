@@ -3,6 +3,8 @@ from __future__ import annotations
 import typing
 from abc import ABC, abstractmethod
 
+from .argument import Argument, Option
+
 if typing.TYPE_CHECKING:
     from cleez import CLI
 
@@ -19,60 +21,52 @@ class Command(ABC):
 
     hide_from_help: bool = False
 
+    _subcommands: list[Command]
+
     def __init__(self, cli):
         self.cli = cli
         self.subparsers = None
+        self._subcommands = []
 
     @abstractmethod
     def run(self, *args, **kwargs):
         raise NotImplementedError
 
-    def add_subparser_to(self, subparsers):
+    def add_to_subparsers(self, subparsers):
         name = self.split()[-1]
 
         subparser = subparsers.add_parser(name, help=self.__doc__)
         subparser.set_defaults(_command=self)
 
         for argument in self.arguments:
-            subparser.add_argument(*argument.args, **argument.kwargs)
+            argument.add_to_parser(subparser)
 
         for option in self.options:
-            subparser.add_argument(*option.args, **option.kwargs)
+            option.add_to_parser(subparser)
 
-        if not self.is_subcommand():
+        if self.has_subcommands():
             self.subparsers = subparser.add_subparsers()
 
-    def is_subcommand(self):
+    def add_subcommand(self, command: Command):
+        self._subcommands.append(command)
+
+    def has_subcommands(self) -> bool:
+        return bool(self._subcommands)
+
+    def is_subcommand(self) -> bool:
         return " " in self.name
 
-    def main_command_name(self):
+    def main_command_name(self) -> str:
         return self.split()[0]
-
-    def subcommand_name(self):
-        return self.split()[1]
 
     def __len__(self):
         return len(self.split())
 
     def split(self):
         args = self.name.split(" ")
-        assert len(args) in {
-            1,
-            2,
-        }, (
+        err_msg = (
             "Command name must be composed of one or "
             "two words (i.e. '<command> <subcommand>')"
         )
+        assert len(args) in {1, 2}, err_msg
         return args
-
-
-class Argument:
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-
-
-class Option:
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
