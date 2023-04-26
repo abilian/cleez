@@ -1,4 +1,5 @@
 from argparse import (
+    Action,
     _AppendAction,
     _AppendConstAction,
     _CountAction,
@@ -23,3 +24,17 @@ HELP = _HelpAction
 VERSION = _VersionAction
 PARSERS = _SubParsersAction
 EXTEND = _ExtendAction
+
+
+#
+# Extra actions
+#
+
+
+class SplitArgs(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = values or ""
+        setattr(namespace, self.dest, values.split(","))
+
+
+SPLIT_ARGS = SplitArgs

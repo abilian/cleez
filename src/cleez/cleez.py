@@ -156,6 +156,9 @@ class CLI:
             # Needed ?
             if name == "self":
                 continue
+            if name == "_args":
+                kwargs[name] = args
+                continue
             if name in args:
                 value = getattr(args, name)
             else:
