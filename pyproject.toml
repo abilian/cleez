@@ -5,9 +5,9 @@ version = "0.1.10"
 homepage = "https://github.com/abilian/cleez"
 description = "Simple class-based CLI framework."
 authors = ["Abilian SAS <sf@abilian.com>"]
-readme = "README.rst"
+readme = "README.md"
 classifiers=[
-    'Development Status :: 2 - Pre-Alpha',
+    'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
     'Natural Language :: English',
     'Programming Language :: Python :: 3',
@@ -17,16 +17,12 @@ classifiers=[
 ]
 packages = [
     { include = "cleez", from = "src" },
-    #    { include = "tests", format = "sdist" },
 ]
 
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4"
 termcolor = "^2.2.0"
-
-# Temp (for debugging)
-snoop = "^0.4.3"
 
 [tool.poetry.group.dev.dependencies]
 ## Standard cruft
@@ -38,6 +34,7 @@ toml = "*"
 
 ## /standard cruft
 devtools = "^0.11.0"
+snoop = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
