@@ -66,16 +66,25 @@ class CLI:
 
     def scan(self, module_name: str):
         root_module = importlib.import_module(module_name)
+        self.scan_module(root_module)
+
+        if not (root_module.__file__ or "").endswith("__init__.py"):
+            return
+
+        # scan package submodules
         root_module_name = root_module.__name__
         root_path = Path(root_module.__file__).parent  # type: ignore
         for _, module_name, _ in iter_modules([str(root_path)]):
             module = importlib.import_module(f"{root_module_name}.{module_name}")
-            for attribute_name in dir(module):
-                attribute = getattr(module, attribute_name)
+            self.scan_module(module)
 
-                if isclass(attribute) and issubclass(attribute, Command):
-                    command = attribute
-                    self.add_command(command)
+    def scan_module(self, module):
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+
+            if isclass(attribute) and issubclass(attribute, Command):
+                command = attribute
+                self.add_command(command)
 
     def add_command(self, command_class: type[Command]):
         if isabstract(command_class):
