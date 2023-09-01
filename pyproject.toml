@@ -102,6 +102,7 @@ ignore = [
     "A001",  # Shadowing of built-in
     "A002",  # Argument `input` is shadowing a python builtin
     "I001",  # Ruff not agreeing with isort
+    "RUF012",  # Mutable class attributes should be annotated
 ]
 
 # ---
