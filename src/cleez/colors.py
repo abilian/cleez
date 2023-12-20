@@ -24,3 +24,10 @@ def bold(text):
 
 def dim(text):
     return colored(text, attrs=["dark"])
+
+
+success = green
+error = red
+warning = yellow
+info = blue
+debug = dim
