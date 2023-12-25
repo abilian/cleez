@@ -28,11 +28,13 @@ Similar to Cleo, but based on the stdlib\'s argparse module.
 - ANSI color output.
 
 
+
 ### Upcoming features
 
 - Command aliases.
 - Command arguments completion.
 - Better help messages
+
 
 
 ### Used by
@@ -41,6 +43,15 @@ Cleez is currently used by several projects:
 
 - [Nua](https://github.com/abilian/nua) - an Open source PaaS and application marketplace
 - [Abilian Developer Tools](https://github.com/abilian/abilian-devtools) -
+- (Add yours)
+
+
+### Alternatives
+
+- Click
+- Typer
+- [Clizy](https://github.com/getclizy/clizy)
+- [Mando](https://github.com/rubik/mando)
 
 
 ### Credits

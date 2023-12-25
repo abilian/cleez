@@ -33,7 +33,7 @@ cruft = "*"
 toml = "*"
 
 ## /standard cruft
-devtools = "^0.11.0"
+devtools = "^0.12.2"
 snoop = "*"
 
 [build-system]
