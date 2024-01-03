@@ -52,6 +52,8 @@ Cleez is currently used by several projects:
 - Typer
 - [Clizy](https://github.com/getclizy/clizy)
 - [Mando](https://github.com/rubik/mando)
+- [dephell-argparse](https://pypi.org/project/dephell-argparse/)
+
 
 
 ### Credits
