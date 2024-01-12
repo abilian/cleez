@@ -194,7 +194,7 @@ class CLI:
         return self.name
 
 
-def run(module_name: str="", argv=None):
+def run(module_name: str = "", argv=None):
     cli = CLI()
     if module_name:
         cli.scan(module_name)
