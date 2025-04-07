@@ -8,4 +8,4 @@ from .cleez import CLI
 from .command import Argument, Command, Option
 from .exceptions import BadArgumentError, CommandError
 
-__all__ = ["CLI", "Command", "CommandError", "BadArgumentError", "Argument", "Option"]
+__all__ = ["CLI", "Argument", "BadArgumentError", "Command", "CommandError", "Option"]

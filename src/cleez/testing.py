@@ -236,8 +236,9 @@ class Result:
         return_value: t.Any,
         exit_code: int,
         exception: BaseException | None,
-        exc_info: tuple[type[BaseException], BaseException, TracebackType]
-        | None = None,
+        exc_info: (
+            tuple[type[BaseException], BaseException, TracebackType] | None
+        ) = None,
     ):
         #: The runner that created the result
         self.runner = runner

@@ -14,7 +14,7 @@ class CommandWithNoArgument(Command):
         print("Hello!")
 
 
-@pytest.fixture()
+@pytest.fixture
 def cli():
     cli = CLI()
     cli.add_command(CommandWithNoArgument)

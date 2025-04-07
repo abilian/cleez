@@ -1,51 +1,49 @@
-[tool]
-[tool.poetry]
+[project]
+authors = [
+    {name = "Abilian SAS", email = "sf@abilian.com"},
+]
+requires-python = "<4,>=3.9"
+dependencies = [
+    "termcolor ~= 3.0",
+]
 name = "cleez"
 version = "0.1.13"
-homepage = "https://github.com/abilian/cleez"
 description = "Simple class-based CLI framework."
-authors = ["Abilian SAS <sf@abilian.com>"]
 readme = "README.md"
-classifiers=[
-    'Development Status :: 3 - Alpha',
-    'Intended Audience :: Developers',
-    'Natural Language :: English',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-]
-packages = [
-    { include = "cleez", from = "src" },
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 
+[project.urls]
+homepage = "https://github.com/abilian/cleez"
 
-[tool.poetry.dependencies]
-python = ">=3.9,<4"
-termcolor = "^2.2.0"
+[dependency-groups]
+dev = [
+    "abilian-devtools",
+    "cruft",
+    "toml",
+    "devtools<1.0.0,>=0.12.2",
+    "snoop",
+]
 
-[tool.poetry.group.dev.dependencies]
-## Standard cruft
-abilian-devtools = "*"
-
-# Cruft (project templates management)
-cruft = "*"
-toml = "*"
-
-## /standard cruft
-devtools = "^0.12.2"
-snoop = "*"
-
+[tool.pdm.build]
+includes = ["src/cleez"]
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
-# ---
+# ------------------------------------------------------------------
 
 [tool.isort]
 profile = "black"
 
-# ---
+# ------------------------------------------------------------------
 
 # pyproject.toml
 [tool.pytest.ini_options]
@@ -59,9 +57,9 @@ testpaths = [
     "src",
 ]
 
-# ---
+# ------------------------------------------------------------------
 
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     "F",
     "E",
@@ -87,13 +85,6 @@ select = [
 
 exclude = [
     "src/cleez/testing.py",
-#    ".tox",
-#    ".nox",
-#    "tests",
-#    "sandbox",
-#    "doc",
-#    "scripts",
-#    "tmp",
 ]
 
 ignore = [
@@ -105,7 +96,7 @@ ignore = [
     "RUF012",  # Mutable class attributes should be annotated
 ]
 
-# ---
+# ------------------------------------------------------------------
 
 [tool.bandit]
 skips = [
@@ -113,7 +104,7 @@ skips = [
   "B603", # subprocess_without_shell_equals_true
 ]
 
-# ---
+# ------------------------------------------------------------------
 
 [tool.pyanalyze]
 paths = ["src/"]
@@ -150,7 +141,7 @@ possibly_undefined_name = false
 undefined_attribute = false
 unused_variable = false
 
-# ---
+# ------------------------------------------------------------------
 
 [tool.deptry]
 ignore_obsolete = [
@@ -163,8 +154,7 @@ exclude = [
     '.tox', 'tests', 'sandbox', 'doc', 'scripts',
 ]
 
-
-# ---
+# ------------------------------------------------------------------
 
 [tool.pyright]
 exclude = [

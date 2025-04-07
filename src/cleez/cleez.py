@@ -3,6 +3,7 @@ commands and subcommands.
 
 Similar to Cleo, but based on the stdlib's argparse module.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -25,7 +26,10 @@ __all__ = ["CLI"]
 
 from .parser import PatchedArgumentParser
 
-DEBUG = os.environ.get("DEBUG_CLEEZ", False)
+if os.environ.get("DEBUG_CLEEZ", "false").lower() == "true":
+    DEBUG = True
+else:
+    DEBUG = False
 
 
 @dataclass(frozen=True)
@@ -74,9 +78,9 @@ class CLI:
         # scan package submodules
         root_module_name = root_module.__name__
         root_path = Path(root_module.__file__).parent  # type: ignore
-        for _, module_name, _ in iter_modules([str(root_path)]):
-            module = importlib.import_module(f"{root_module_name}.{module_name}")
-            self.scan_module(module)
+        for _, submodule_name, _ in iter_modules([str(root_path)]):
+            submodule = importlib.import_module(f"{root_module_name}.{submodule_name}")
+            self.scan_module(submodule)
 
     def scan_module(self, module):
         for attribute_name in dir(module):

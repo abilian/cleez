@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from cleez import CLI
 
 
-__all__ = ["Command", "Argument", "Option"]
+__all__ = ["Argument", "Command", "Option"]
 
 
 class Command(ABC):
