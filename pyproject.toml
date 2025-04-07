@@ -7,7 +7,7 @@ dependencies = [
     "termcolor ~= 3.0",
 ]
 name = "cleez"
-version = "0.1.13"
+version = "0.1.14"
 description = "Simple class-based CLI framework."
 readme = "README.md"
 classifiers = [
